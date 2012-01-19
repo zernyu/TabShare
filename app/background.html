@@ -2,7 +2,7 @@
   <head>
     <script>
       chrome.browserAction.onClicked.addListener(function() {
-        var appUrl = chrome.extension.getURL("dashboard.html");
+        var appUrl = chrome.extension.getURL("app/dashboard.html");
         chrome.tabs.create({
           url: appUrl,
           selected: true
