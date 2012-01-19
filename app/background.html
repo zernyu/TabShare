@@ -1,0 +1,13 @@
+<html>
+  <head>
+    <script>
+      chrome.browserAction.onClicked.addListener(function() {
+        var appUrl = chrome.extension.getURL("dashboard.html");
+        chrome.tabs.create({
+          url: appUrl,
+          selected: true
+        });
+      });
+    </script>
+  </head>
+</html>
