@@ -1,0 +1,11 @@
+{
+  "name": "TabShare",
+  "version": "1.0",
+  "description": "Share tabs between computers!",
+  "background_page": "app/background.html",
+  "browser_action": {
+  },
+  "permissions": [
+    "tabs"
+  ]
+}
