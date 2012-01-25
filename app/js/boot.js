@@ -1,4 +1,5 @@
 require([
+  'dojo',
   'dojo/domReady!'
 ], function() {
   chrome.tabs.query({}, function(tabs) {
