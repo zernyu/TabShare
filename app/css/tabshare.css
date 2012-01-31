@@ -1,0 +1,10 @@
+.sessionContainer .tabshareBrowser {
+    width: 400px;
+    height: 300px;
+    background-color: #eee;
+    border: 1px solid #ddd;
+}
+
+.sessionContainer .tabshareBrowser .tabshareBrowserTitle {
+    background-color: #38f;
+}
