@@ -1,10 +1,4 @@
 require([
-  'dojo',
-  'dojo/domReady!'
+  'dojo'
 ], function() {
-  chrome.tabs.query({}, function(tabs) {
-    dojo.forEach(tabs, function(tab) {
-      dojo.create("p", {innerHTML: tab.title}, dojo.body());
-    });
-  });
 });
