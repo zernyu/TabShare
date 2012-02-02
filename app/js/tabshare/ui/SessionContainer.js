@@ -6,13 +6,18 @@ define([
     'dojo/_base/lang',
     'dojo/dnd/move',
     'dojo/text!./templates/SessionContainer.html',
+    'dgrid/Keyboard',
+    'dgrid/List',
+    'dgrid/Selection',
     'dijit/_Widget',
-    'dijit/_TemplatedMixin',
     'dijit/_WidgetsInTemplateMixin',
+    'dijit/_TemplatedMixin',
         'dijit/layout/BorderContainer',
-        'dijit/layout/ContentPane',
-        'dgrid/List'
-], function(module, array, declare, html, lang, move, template, _Widget, _TemplatedMixin, _WidgetsInTemplateMixin) {
+        'dijit/layout/ContentPane'
+], function(module,
+            array, declare, html, lang, move, template,
+            Keyboard, List, Selection,
+            _Widget, _WidgetsInTemplateMixin, _TemplatedMixin) {
     return declare(module.id.replace(/\//g, '.'), [_Widget, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: template,
         baseClass: 'sessionContainer',
@@ -20,18 +25,29 @@ define([
         titleBar: null, // Reference to the title bar node
         contentBox: null, // Reference to the main contents node
 
-        postCreate: function() {
-            chrome.tabs.query({}, lang.hitch(this, function(tabs) {
-                array.forEach(tabs, function(tab) {
-                    html.create("p", {innerHTML: tab.title}, this.contentBox.domNode);
-                }, this);
-            }));
+        grid: null, // Reference to the dgrid containing the list of tabs
 
+        buildRendering: function() {
+            this.inherited(arguments);
+
+            // Create the dgrid to display the currently open tabs
+            var TabList = declare([List, Selection, Keyboard]);
+            this.grid = new TabList({}, this.contentBox.domNode);
+
+            // Make the SessionContainer draggable
             new move.parentConstrainedMoveable(this.domNode, {
                 handle: this.titleBar.domNode,
                 area: 'content',
                 within: true
             });
+        },
+
+        postCreate: function() {
+            chrome.tabs.query({}, lang.hitch(this, function(tabs) {
+                this.grid.renderArray(array.map(tabs, function(tab) {
+                    return tab.title;
+                }));
+            }));
         }
     });
 });

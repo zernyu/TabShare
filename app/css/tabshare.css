@@ -13,5 +13,8 @@
 }
 
 .sessionContainer .tabshareBrowser .tabshareBrowserContent {
-    padding: 5px;
+}
+
+.sessionContainer .tabshareBrowser .tabshareBrowserContent .dgrid-scroller {
+    margin-top: 0;
 }
