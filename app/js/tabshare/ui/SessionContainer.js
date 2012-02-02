@@ -18,6 +18,12 @@ define([
             array, declare, html, lang, move, template,
             Keyboard, List, Selection,
             _Widget, _WidgetsInTemplateMixin, _TemplatedMixin) {
+
+    /**
+     * This widget is a mini representation of a browser window. It has
+     * a list of the tabs open in this window and the tabs are draggable
+     * between windows.
+     */
     return declare(module.id.replace(/\//g, '.'), [_Widget, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: template,
         baseClass: 'sessionContainer',
