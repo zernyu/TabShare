@@ -38,7 +38,8 @@ define([
 
             // Create the dgrid to display the currently open tabs
             var TabList = declare([List, Selection, Keyboard]);
-            this.grid = new TabList({}, this.contentBox.domNode);
+            var gridNode = html.create('div', {}, this.contentBox.domNode);
+            this.grid = new TabList({}, gridNode);
 
             // Make the SessionContainer draggable
             new move.parentConstrainedMoveable(this.domNode, {
