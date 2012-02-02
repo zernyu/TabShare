@@ -4,17 +4,21 @@ define([
     'dojo/_base/declare',
     'dojo/_base/html',
     'dojo/_base/lang',
-    'dojo/dnd/Moveable',
+    'dojo/dnd/move',
     'dojo/text!./templates/SessionContainer.html',
     'dijit/_Widget',
     'dijit/_TemplatedMixin',
     'dijit/_WidgetsInTemplateMixin',
         'dijit/layout/BorderContainer',
-        'dijit/layout/ContentPane'
-], function(module, array, declare, html, lang, Moveable, template, _Widget, _TemplatedMixin, _WidgetsInTemplateMixin) {
+        'dijit/layout/ContentPane',
+        'dgrid/List'
+], function(module, array, declare, html, lang, move, template, _Widget, _TemplatedMixin, _WidgetsInTemplateMixin) {
     return declare(module.id.replace(/\//g, '.'), [_Widget, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: template,
         baseClass: 'sessionContainer',
+
+        titleBar: null, // Reference to the title bar node
+        contentBox: null, // Reference to the main contents node
 
         postCreate: function() {
             chrome.tabs.query({}, lang.hitch(this, function(tabs) {
@@ -23,7 +27,11 @@ define([
                 }, this);
             }));
 
-            var dnd = Moveable(this.domNode);
+            new move.parentConstrainedMoveable(this.domNode, {
+                handle: this.titleBar.domNode,
+                area: 'content',
+                within: true
+            });
         }
     });
 });

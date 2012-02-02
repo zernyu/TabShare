@@ -7,4 +7,11 @@
 
 .sessionContainer .tabshareBrowser .tabshareBrowserTitle {
     background-color: #38f;
+    padding: 2px 5px;
+    height: 20px;
+    line-height: 20px;
+}
+
+.sessionContainer .tabshareBrowser .tabshareBrowserContent {
+    padding: 5px;
 }
