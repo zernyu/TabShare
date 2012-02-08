@@ -5,8 +5,10 @@ require([
 ], function() {
     chrome.windows.getAll({populate: true}, function(windows) {
         dojo.forEach(windows, function(window) {
-            new tabshare.ui.SessionContainer(dojo.body());
-            console.log(window);
+            var sessionContainer = new tabshare.ui.SessionContainer({
+                tabs: window.tabs
+            });
+            sessionContainer.placeAt(dojo.body());
         });
     });
 });

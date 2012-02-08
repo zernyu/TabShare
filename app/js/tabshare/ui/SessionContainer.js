@@ -35,6 +35,7 @@ define([
         contentBox: null, // Reference to the main contents node
 
         grid: null, // Reference to the dgrid containing the list of tabs
+        tabs: null, // An array of the window's tabs
 
         buildRendering: function() {
             this.inherited(arguments);
@@ -54,10 +55,8 @@ define([
         },
 
         postCreate: function() {
-            chrome.tabs.query({}, lang.hitch(this, function(tabs) {
-                this.grid.renderArray(array.map(tabs, function(tab) {
-                    return tab.title;
-                }));
+            this.grid.renderArray(array.map(this.tabs, function(tab) {
+                return tab.title;
             }));
         }
     });
