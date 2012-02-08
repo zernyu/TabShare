@@ -5,26 +5,29 @@ define([
     'dojo/_base/html',
     'dojo/_base/lang',
     'dojo/dnd/move',
+    'tabshare/ui/Moveable',
+    'tabshare/ui/Mover',
     'dojo/text!./templates/SessionContainer.html',
     'dgrid/Keyboard',
     'dgrid/List',
     'dgrid/Selection',
-    'dijit/_Widget',
-    'dijit/_WidgetsInTemplateMixin',
+    'dijit/_FocusMixin',
     'dijit/_TemplatedMixin',
+    'dijit/_WidgetBase',
+    'dijit/_WidgetsInTemplateMixin',
         'dijit/layout/BorderContainer',
         'dijit/layout/ContentPane'
 ], function(module,
-            array, declare, html, lang, move, template,
+            array, declare, html, lang, move, Moveable, Mover, template,
             Keyboard, List, Selection,
-            _Widget, _WidgetsInTemplateMixin, _TemplatedMixin) {
+            _FocusMixin, _TemplatedMixin, _WidgetBase, _WidgetsInTemplateMixin) {
 
     /**
      * This widget is a mini representation of a browser window. It has
      * a list of the tabs open in this window and the tabs are draggable
      * between windows.
      */
-    return declare(module.id.replace(/\//g, '.'), [_Widget, _TemplatedMixin, _WidgetsInTemplateMixin], {
+    return declare(module.id.replace(/\//g, '.'), [_WidgetBase, _FocusMixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: template,
         baseClass: 'sessionContainer',
 
@@ -42,10 +45,11 @@ define([
             this.grid = new TabList({}, gridNode);
 
             // Make the SessionContainer draggable
-            new move.parentConstrainedMoveable(this.domNode, {
+            new Moveable(this.domNode, {
                 handle: this.titleBar.domNode,
                 area: 'content',
-                within: true
+                within: true,
+                mover: Mover
             });
         },
 

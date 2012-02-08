@@ -17,11 +17,5 @@ window.dojoConfig = {
             name: 'tabshare',
             location: 'tabshare'
         }
-    ],
-    require: [
-        'tabshare'
-    ],
-    addOnLoad: function() {
-        console.log("wtf");
-    }
+    ]
 };
