@@ -1,6 +1,6 @@
 define([
     'dojo/_base/lang',
-    'tabshare/ui/SessionContainer'
+    'tabshare/ui/WindowContainer'
 ], function(lang) {
     return lang.getObject('tabshare');
 });

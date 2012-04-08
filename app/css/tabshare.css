@@ -16,7 +16,7 @@ body {
     background-color: rgba(0, 0, 0, 0.7);
 }
 
-.sessionContainer .tabshareBrowser {
+.windowContainer .tabshareBrowser {
     width: 400px;
     height: 300px;
     background-color: #fff;
@@ -24,7 +24,7 @@ body {
     border-top-right-radius: 5px;
 }
 
-.sessionContainer .tabshareBrowser .tabshareBrowserTitle {
+.windowContainer .tabshareBrowser .tabshareBrowserTitle {
     background-color: #aaa;
     padding: 2px 5px;
     height: 20px;
@@ -33,14 +33,14 @@ body {
     border-top-right-radius: 5px;
 }
 
-.sessionContainer .tabshareBrowser .tabshareBrowserContent {
+.windowContainer .tabshareBrowser .tabshareBrowserContent {
 }
 
-.sessionContainer .tabshareBrowser .tabshareBrowserContent .dgrid {
+.windowContainer .tabshareBrowser .tabshareBrowserContent .dgrid {
     border: 0;
     height: 100%;
 }
 
-.sessionContainer .tabshareBrowser .tabshareBrowserContent .dgrid-scroller {
+.windowContainer .tabshareBrowser .tabshareBrowserContent .dgrid-scroller {
     margin-top: 0;
 }

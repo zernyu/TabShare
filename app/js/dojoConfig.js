@@ -7,11 +7,15 @@ window.dojoConfig = {
     packages: [
         {
             name: 'dojo',
-            location: 'http://ajax.googleapis.com/ajax/libs/dojo/1.7.1/dojo'
+            location: 'http://ajax.googleapis.com/ajax/libs/dojo/1.7.2/dojo'
         },
         {
             name: 'dijit',
-            location: 'http://ajax.googleapis.com/ajax/libs/dojo/1.7.1/dijit'
+            location: 'http://ajax.googleapis.com/ajax/libs/dojo/1.7.2/dijit'
+        },
+        {
+            name: 'dojox',
+            location: 'http://ajax.googleapis.com/ajax/libs/dojo/1.7.2/dojox'
         },
         {
             name: 'tabshare',
