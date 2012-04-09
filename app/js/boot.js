@@ -11,6 +11,7 @@ require([
                 windowId: window.id
             });
             windowContainer.placeAt(dojo.body());
+            windowContainer.startup();
         });
     });
 

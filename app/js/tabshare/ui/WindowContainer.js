@@ -1,33 +1,21 @@
 define([
     'module',
-    'dojo/_base/array',
-    'dojo/_base/connect',
-    'dojo/_base/declare',
-    'dojo/_base/html',
-    'dojo/_base/lang',
+    'dojo/_base/array', 'dojo/_base/connect', 'dojo/_base/declare', 'dojo/_base/html', 'dojo/_base/lang',
     'dojo/dnd/move',
-    'dojo/store/Memory',
-    'dojo/store/Observable',
-    'tabshare/ui/Moveable',
-    'tabshare/ui/Mover',
+    'dojo/store/Memory', 'dojo/store/Observable',
+    'tabshare/ui/Moveable', 'tabshare/ui/Mover',
     'dojo/text!./templates/WindowContainer.html',
-    'dgrid/Keyboard',
-    'dgrid/OnDemandList',
-    'dgrid/Selection',
-    'dijit/_FocusMixin',
-    'dijit/_TemplatedMixin',
-    'dijit/_WidgetBase',
-    'dijit/_WidgetsInTemplateMixin',
+    'dgrid/Keyboard', 'dgrid/OnDemandGrid', 'dgrid/Selection',
+    'dijit/_FocusMixin', 'dijit/_TemplatedMixin', 'dijit/_WidgetBase', 'dijit/_WidgetsInTemplateMixin',
         'dijit/layout/BorderContainer',
         'dijit/layout/ContentPane'
 ], function(module,
             array, connect, declare, html, lang,
             move,
-            Memory,
-            Observable,
+            Memory, Observable,
             Moveable, Mover,
             template,
-            Keyboard, List, Selection,
+            Keyboard, Grid, Selection,
             _FocusMixin, _TemplatedMixin, _WidgetBase, _WidgetsInTemplateMixin) {
 
     /**
@@ -50,14 +38,23 @@ define([
             this.inherited(arguments);
 
             // Create the dgrid to display the currently open tabs
-            var TabList = declare([List, Selection, Keyboard]);
+            var TabGrid = declare([Grid, Selection, Keyboard]);
             var gridNode = html.create('div', {}, this.contentBox.domNode);
-            this.grid = new TabList({
-                store: new Memory({
+            this.grid = new TabGrid({
+                store: Observable(new Memory({
                     data: array.map(this.tabs, function(tab) {
-                        return tab.title
+                        return {
+                            id: tab.id,
+                            title: tab.title
+                        };
                     })
-                })
+                })),
+                columns: [
+                    {
+                        field: 'title'
+                    }
+                ],
+                showHeader: false
             }, gridNode);
 
             // Make the WindowContainer draggable
@@ -70,18 +67,21 @@ define([
         },
 
         postCreate: function() {
-            // Populate the grid with the current window's open tabs
-//            this.grid.renderArray(array.map(this.tabs, function(tab) {
-//                return tab.title;
-//            }));
-
             connect.subscribe('/tabshare/windowUpdate', this, this.refresh);
+        },
+
+        startup: function() {
+            this.inherited(arguments);
+            this.grid.startup();
         },
 
         refresh: function() {
             chrome.tabs.getAllInWindow(this.windowId, lang.hitch(this, function(tabs) {
                 this.grid.renderArray(array.map(tabs, function(tab) {
-                    return tab.title;
+                    return {
+                        id: tab.id,
+                        title: tab.title
+                    };
                 }));
             }));
         }
