@@ -5,10 +5,10 @@ This is a Google Chrome extension that will let users easily share tabs with the
 
 Dependencies
 ------------
-`dojo`
-`dijit`
-`dgrid`
-`xstyle`
-`put-selector`
+* `dojo` - 1.7.2
+* `dijit`
+* `dgrid`
+* `xstyle`
+* `put-selector`
 
-Place these libraries in app/js
+Place these libraries in /app/js
