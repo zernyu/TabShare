@@ -1,4 +1,10 @@
 *.swp
 .idea
 *.iml
-dojo-release-1.7.1-src
+app/js/dojo
+app/js/dijit
+app/js/dojox
+app/js/util
+app/js/dgrid
+app/js/xstyle
+app/js/put-selector
