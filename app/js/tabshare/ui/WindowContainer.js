@@ -2,20 +2,20 @@ define([
     'module',
     'dojo/_base/array', 'dojo/_base/connect', 'dojo/_base/declare', 'dojo/_base/html', 'dojo/_base/lang',
     'dojo/dnd/move',
-    'dojo/store/Memory', 'dojo/store/Observable',
+    'dojo/store/Memory',
     'tabshare/ui/Moveable', 'tabshare/ui/Mover',
     'dojo/text!./templates/WindowContainer.html',
-    'dgrid/Keyboard', 'dgrid/OnDemandGrid', 'dgrid/Selection',
+    'dgrid/extensions/DnD', 'dgrid/Keyboard', 'dgrid/OnDemandGrid', 'dgrid/Selection',
     'dijit/_FocusMixin', 'dijit/_TemplatedMixin', 'dijit/_WidgetBase', 'dijit/_WidgetsInTemplateMixin',
         'dijit/layout/BorderContainer',
         'dijit/layout/ContentPane'
 ], function(module,
             array, connect, declare, html, lang,
             move,
-            Memory, Observable,
+            Memory,
             Moveable, Mover,
             template,
-            Keyboard, Grid, Selection,
+            DnD, Keyboard, Grid, Selection,
             _FocusMixin, _TemplatedMixin, _WidgetBase, _WidgetsInTemplateMixin) {
 
     /**
@@ -31,24 +31,46 @@ define([
         contentBox: null, // Reference to the main contents node
 
         grid: null,       // Reference to the dgrid containing the list of tabs
+        moveHandle: null, // Reference to the Moveable handle
+
         tabs: null,       // An array of the window's tabs
         windowId: null,   // The ID of this window
 
+        /**
+         * Refresh this window's open tabs
+         */
+        refresh: function() {
+            chrome.tabs.getAllInWindow(this.windowId, lang.hitch(this, function(tabs) {
+                this.grid.store.setData(array.map(tabs, function(tab) {
+                    return {
+                        id: tab.id,
+                        index: tab.index,
+                        title: tab.title,
+                        url: tab.url
+                    };
+                }));
+                this.grid.refresh();
+            }));
+        },
+
+        // Widget lifecycle
         buildRendering: function() {
             this.inherited(arguments);
 
             // Create the dgrid to display the currently open tabs
-            var TabGrid = declare([Grid, Selection, Keyboard]);
+            var TabGrid = declare([Grid, Selection, Keyboard, DnD]);
             var gridNode = html.create('div', {}, this.contentBox.domNode);
             this.grid = new TabGrid({
-                store: Observable(new Memory({
+                store: new Memory({
                     data: array.map(this.tabs, function(tab) {
                         return {
                             id: tab.id,
-                            title: tab.title
+                            index: tab.index,
+                            title: tab.title,
+                            url: tab.url
                         };
                     })
-                })),
+                }),
                 columns: [
                     {
                         field: 'title'
@@ -58,7 +80,7 @@ define([
             }, gridNode);
 
             // Make the WindowContainer draggable
-            new Moveable(this.domNode, {
+            this.moveHandle = new Moveable(this.domNode, {
                 handle: this.titleBar.domNode,
                 area: 'content',
                 within: true,
@@ -75,15 +97,9 @@ define([
             this.grid.startup();
         },
 
-        refresh: function() {
-            chrome.tabs.getAllInWindow(this.windowId, lang.hitch(this, function(tabs) {
-                this.grid.renderArray(array.map(tabs, function(tab) {
-                    return {
-                        id: tab.id,
-                        title: tab.title
-                    };
-                }));
-            }));
+        uninitialize: function() {
+            this.grid.destroy();
+            this.moveHandle.destroy();
         }
     });
 });
