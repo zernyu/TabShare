@@ -36,24 +36,6 @@ define([
         tabs: null,       // An array of the window's tabs
         windowId: null,   // The ID of this window
 
-        /**
-         * Refresh this window's open tabs
-         */
-        refresh: function() {
-            chrome.tabs.getAllInWindow(this.windowId, lang.hitch(this, function(tabs) {
-                this.grid.store.setData(array.map(tabs, function(tab) {
-                    return {
-                        id: tab.id,
-                        index: tab.index,
-                        title: tab.title,
-                        url: tab.url
-                    };
-                }));
-                this.grid.refresh();
-            }));
-        },
-
-        // Widget lifecycle
         buildRendering: function() {
             this.inherited(arguments);
 
@@ -89,7 +71,7 @@ define([
         },
 
         postCreate: function() {
-            connect.subscribe('/tabshare/windowUpdate', this, this.refresh);
+            connect.subscribe('/tabshare/tabUpdate', this, this.refresh);
         },
 
         startup: function() {
@@ -100,6 +82,25 @@ define([
         uninitialize: function() {
             this.grid.destroy();
             this.moveHandle.destroy();
+
+            this.inherited(arguments);
+        },
+
+        /**
+         * Refresh this window's open tabs
+         */
+        refresh: function() {
+            chrome.tabs.getAllInWindow(this.windowId, lang.hitch(this, function(tabs) {
+                this.grid.store.setData(array.map(tabs, function(tab) {
+                    return {
+                        id: tab.id,
+                        index: tab.index,
+                        title: tab.title,
+                        url: tab.url
+                    };
+                }));
+                this.grid.refresh();
+            }));
         }
     });
 });
