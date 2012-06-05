@@ -1,6 +1,6 @@
 define([
     'module',
-    'dojo/_base/array', 'dojo/_base/connect', 'dojo/_base/declare', 'dojo/_base/html', 'dojo/_base/lang',
+    'dojo/_base/array', 'dojo/_base/declare', 'dojo/_base/html', 'dojo/_base/lang',
     'dojo/dnd/move',
     'dojo/store/Memory',
     'tabshare/ui/Moveable', 'tabshare/ui/Mover',
@@ -10,7 +10,7 @@ define([
         'dijit/layout/BorderContainer',
         'dijit/layout/ContentPane'
 ], function(module,
-            array, connect, declare, html, lang,
+            array, declare, html, lang,
             move,
             Memory,
             Moveable, Mover,
@@ -28,38 +28,31 @@ define([
         baseClass: 'windowContainer',
 
         titleBar: null,   // Reference to the title bar node
-        contentBox: null, // Reference to the main contents node
+        gridNode: null,   // Reference to the dgrid node
 
-        grid: null,       // Reference to the dgrid containing the list of tabs
+        grid: null,       // Reference to the dgrid displaying the list of tabs
+        store: null,      // Reference to the store containing the list of tabs
         moveHandle: null, // Reference to the Moveable handle
 
-        tabs: null,       // An array of the window's tabs
         windowId: null,   // The ID of this window
 
         buildRendering: function() {
             this.inherited(arguments);
 
+            // Create the store to hold the currently open tabs
+            this.store = new Memory();
+
             // Create the dgrid to display the currently open tabs
             var TabGrid = declare([Grid, Selection, Keyboard, DnD]);
-            var gridNode = html.create('div', {}, this.contentBox.domNode);
             this.grid = new TabGrid({
-                store: new Memory({
-                    data: array.map(this.tabs, function(tab) {
-                        return {
-                            id: tab.id,
-                            index: tab.index,
-                            title: tab.title,
-                            url: tab.url
-                        };
-                    })
-                }),
+                store: this.store,
                 columns: [
                     {
                         field: 'title'
                     }
                 ],
                 showHeader: false
-            }, gridNode);
+            }, this.gridNode);
 
             // Make the WindowContainer draggable
             this.moveHandle = new Moveable(this.domNode, {
@@ -71,7 +64,7 @@ define([
         },
 
         postCreate: function() {
-            connect.subscribe('/tabshare/tabUpdate', this, this.refresh);
+            this.refresh();
         },
 
         startup: function() {
@@ -84,6 +77,36 @@ define([
             this.moveHandle.destroy();
 
             this.inherited(arguments);
+        },
+
+        /**
+         * Returns whether this window has a tab with the given ID
+         * @param {number} tabId The tab ID to search for
+         * @return {Boolean} Whether this window has a tab with the given ID
+         */
+        hasTab: function(tabId) {
+            // Quick way of looking up a tab ID - tab ID is used as the store's index field
+            return tabId in this.store.index;
+        },
+
+        /**
+         * Handler for Tab events
+         * @param {string}       event  The event that was fired
+         * @param {(Tab|number)} tab    Reference to a Tab or its ID
+         * @param {Object=}      info   An optional object with extra event info
+         */
+        onTabEvent: function(event, tab, info) {
+            switch(event) {
+                case 'onCreated':
+                case 'onAttached':
+                case 'onDetached':
+                case 'onMoved':
+                case 'onRemoved':
+                case 'onUpdated':
+                default:
+                    this.refresh();
+                    break;
+            }
         },
 
         /**
