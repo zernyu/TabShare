@@ -10,14 +10,7 @@ require([
     // Create a new container for each window
     chrome.windows.getAll(function(windows) {
         array.forEach(windows, function(window) {
-            var windowContainer = new tabshare.ui.WindowContainer({
-                windowId: window.id
-            });
-            windowContainer.placeAt(dojo.body());
-            windowContainer.startup();
-
-            // Keep track of the window in the window manager!
-            windowManager.addWindow(windowContainer);
+            windowManager.addWindow(window.id);
         });
     });
 });

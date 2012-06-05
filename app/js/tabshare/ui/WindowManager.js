@@ -1,8 +1,8 @@
 define([
     'module',
-    'dojo/_base/array', 'dojo/_base/declare', 'dojo/_base/lang'
+    'dojo/_base/array', 'dojo/_base/declare', 'dojo/_base/lang', 'dojo/_base/window'
 ], function(module,
-            array, declare, lang) {
+            array, declare, lang, win) {
 
     /**
      * This is the manager that will handle creating/updating/removing WindowContainers, which
@@ -40,10 +40,18 @@ define([
         },
 
         /**
-         * Add a WindowContainer to the window map
-         * @param {tabshare.ui.WindowContainer} windowContainer The WindowContainer
+         * Add a Window to the WindowManager
+         * @param {number} windowId The ID of the Window to manage
          */
-        addWindow: function(windowContainer) {
+        addWindow: function(windowId) {
+            // Create a new WindowContainer to represent the Window being managed
+            var windowContainer = new tabshare.ui.WindowContainer({
+                windowId: windowId
+            });
+            windowContainer.placeAt(win.body());
+            windowContainer.startup();
+
+            // Keep track of the window in the window manager!
             this.windowMap[windowContainer.windowId] = windowContainer;
         },
 
@@ -58,7 +66,7 @@ define([
 
             // Find the window that should be updated and call its Tab event handler
             var windowId = this._findWindowIdByTab(tab);
-            if (windowId in this.windowMap) {
+            if (windowId in this.windowMap) { // TODO: WindowNotFoundException?
                 this.windowMap[windowId].onTabEvent(event, tab, info);
             }
         },
@@ -71,8 +79,13 @@ define([
         onWindowEvent: function(event, window) {
             console.log(event, window);
 
-            if (!isNaN(window)) {
-                this.removeWindow(window);
+            switch(event) {
+                case 'onCreated':
+                    this.addWindow(window.id);
+                    break;
+                case 'onRemoved':
+                    this.removeWindow(window);
+                    break;
             }
         },
 
@@ -81,7 +94,7 @@ define([
          * @param {number} windowId The ID of the Window being closed
          */
         removeWindow: function(windowId) {
-            if (windowId in this.windowMap) {
+            if (windowId in this.windowMap) { // TODO: WindowNotFoundException?
                 this.windowMap[windowId].destroyRecursive();
                 delete this.windowMap[windowId];
             }
@@ -90,7 +103,7 @@ define([
         /**
          * Find the given Tab's containing Window ID
          * @param {(Tab|number)} tab Reference to a Tab or its ID
-         * @return {number} The Window ID of the Tab
+         * @return {number} The Window ID of the Tab or -1 if not found
          * @private
          */
         _findWindowIdByTab: function(tab) {
@@ -105,6 +118,8 @@ define([
                     return windowId;
                 }
             }
+
+            return -1;
         }
     });
 });
