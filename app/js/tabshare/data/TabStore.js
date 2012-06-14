@@ -6,6 +6,7 @@ define([
 
     /**
      * Custom Object Store used for WindowContainers. Supports reordering of tabs.
+     * // TODO: refactor to reorder tabs of non-physical windows (other computers, scratch space)
      */
     return declare([Memory], {
         /**

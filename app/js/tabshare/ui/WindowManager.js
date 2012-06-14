@@ -1,14 +1,14 @@
 define([
     'module',
-    'dojo/_base/array', 'dojo/_base/declare', 'dojo/_base/lang', 'dojo/_base/window'
+    'dojo/_base/array', 'dojo/_base/connect', 'dojo/_base/declare', 'dojo/_base/lang', 'dojo/_base/window'
 ], function(module,
-            array, declare, lang, win) {
+            array, connect, declare, lang, win) {
 
     /**
      * This is the manager that will handle creating/updating/removing WindowContainers, which
      * are representations of the browser's open windows and its tabs
      */
-    declare(module.id.replace(/\//g, '.'), null, {
+    return declare(module.id.replace(/\//g, '.'), null, {
         windowMap: {},  // A map of window IDs to WindowContainers
 
         /**
@@ -37,6 +37,14 @@ define([
             array.forEach(windowEvents, function(event) {
                 chrome.windows[event].addListener(lang.hitch(this, this.onWindowEvent, event));
             }, this);
+
+            connect.subscribe('tabshare/tab/moveInternal', function(source, nodes, copy, targetItem){
+                // TODO
+                console.log(arguments);
+            });
+            connect.subscribe('tabshare/tab/moveExternal', function(targetSource, sourceSource, nodes, copy, targetItem){
+                console.log(arguments);
+            });
         },
 
         /**

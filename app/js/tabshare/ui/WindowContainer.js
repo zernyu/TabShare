@@ -1,6 +1,6 @@
 define([
     'module',
-    'dojo/_base/array', 'dojo/_base/declare', 'dojo/_base/html', 'dojo/_base/lang',
+    'dojo/_base/array', 'dojo/_base/connect', 'dojo/_base/declare', 'dojo/_base/html', 'dojo/_base/lang',
     'dojo/aspect',
     'dojo/dnd/move',
     'dojo/store/Observable',
@@ -12,7 +12,7 @@ define([
         'dijit/layout/BorderContainer',
         'dijit/layout/ContentPane'
 ], function(module,
-            array, declare, html, lang,
+            array, connect, declare, html, lang,
             aspect,
             move,
             Observable,
@@ -64,7 +64,23 @@ define([
                         field: 'title'
                     }
                 ],
-                showHeader: false
+                showHeader: false,
+                dndParams: {
+                    /**
+                     *
+                     * @param nodes
+                     * @param copy
+                     * @param targetItem
+                     */
+                    onDropInternal: function(nodes, copy, targetItem) {
+                        connect.publish('tabshare/tab/moveInternal',
+                            [this, nodes, copy, targetItem]);
+                    },
+                    onDropExternal: function(sourceSource, nodes, copy, targetItem) {
+                        connect.publish('tabshare/tab/moveExternal',
+                            [this, sourceSource, nodes, copy, targetItem]);
+                    }
+                }
             }, this.gridNode);
 
             // Make the WindowContainer draggable
