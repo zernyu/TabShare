@@ -1,8 +1,10 @@
 define([
     'module',
     'dojo/_base/array', 'dojo/_base/declare', 'dojo/_base/html', 'dojo/_base/lang',
+    'dojo/aspect',
     'dojo/dnd/move',
-    'dojo/store/Memory',
+    'dojo/store/Observable',
+    'tabshare/data/TabStore',
     'tabshare/ui/Moveable', 'tabshare/ui/Mover',
     'dojo/text!./templates/WindowContainer.html',
     'dgrid/extensions/DnD', 'dgrid/Keyboard', 'dgrid/OnDemandGrid', 'dgrid/Selection',
@@ -11,8 +13,10 @@ define([
         'dijit/layout/ContentPane'
 ], function(module,
             array, declare, html, lang,
+            aspect,
             move,
-            Memory,
+            Observable,
+            TabStore,
             Moveable, Mover,
             template,
             DnD, Keyboard, Grid, Selection,
@@ -40,12 +44,21 @@ define([
             this.inherited(arguments);
 
             // Create the store to hold the currently open tabs
-            this.store = new Memory();
+            this.store = new TabStore();
+            // Hook into a tab reorder request from the store to actually move the tab in Chrome
+            aspect.before(this.store, 'onMove', lang.hitch(this, function(tabId, currentIndex, targetIndex) {
+                // We need different target index values depending on if we're moving a tab before or after
+                if (currentIndex < targetIndex) {
+                    targetIndex--;
+                }
+                // Move the tab to the new position!
+                chrome.tabs.move(tabId, {index: targetIndex}, lang.hitch(this, this.refresh));
+            }));
 
             // Create the dgrid to display the currently open tabs
             var TabGrid = declare([Grid, Selection, Keyboard, DnD]);
             this.grid = new TabGrid({
-                store: this.store,
+                store: Observable(this.store),
                 columns: [
                     {
                         field: 'title'
@@ -92,7 +105,7 @@ define([
         /**
          * Handler for Tab events
          * @param {string}       event  The event that was fired
-         * @param {(Tab|number)} tab    Reference to a Tab or its ID
+         * @param {(Tab|number)} tab    Reference to a tab or its ID
          * @param {Object=}      info   An optional object with extra event info
          */
         onTabEvent: function(event, tab, info) {
