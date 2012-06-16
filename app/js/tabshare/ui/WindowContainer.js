@@ -1,7 +1,8 @@
 define([
     'module',
-    'dojo/_base/array', 'dojo/_base/connect', 'dojo/_base/declare', 'dojo/_base/html', 'dojo/_base/lang',
+    'dojo/_base/array', 'dojo/_base/connect', 'dojo/_base/declare', 'dojo/_base/Deferred', 'dojo/_base/html', 'dojo/_base/lang',
     'dojo/aspect',
+    'dojo/dom-construct',
     'dojo/dnd/move',
     'dojo/store/Observable',
     'tabshare/data/TabStore',
@@ -12,8 +13,9 @@ define([
         'dijit/layout/BorderContainer',
         'dijit/layout/ContentPane'
 ], function(module,
-            array, connect, declare, html, lang,
+            array, connect, declare, Deferred, html, lang,
             aspect,
+            domConstruct,
             move,
             Observable,
             TabStore,
@@ -58,30 +60,66 @@ define([
             // Create the dgrid to display the currently open tabs
             var TabGrid = declare([Grid, Selection, Keyboard, DnD]);
             this.grid = new TabGrid({
+                windowId: this.windowId,
                 store: Observable(this.store),
                 columns: [
                     {
-                        field: 'title'
+                        field: 'favicon',
+                        renderCell: function(object, favicon, td) {
+                            domConstruct.create("img", {
+                                src: favicon,
+                                width: 16,
+                                height: 16,
+                                title: object.title
+                            }, td);
+                        }
+                    },
+                    {
+                        field: 'title',
+                        renderCell: function(object, title, td) {
+                            domConstruct.create("h1", {
+                                innerHTML: title
+                            }, td);
+                            domConstruct.create("h2", {
+                                innerHTML: object.url
+                            }, td);
+                        }
                     }
                 ],
-                showHeader: false,
-                dndParams: {
+                showHeader: false, // Hide the grid header
+                dndParams: { // Override some drag and drop callbacks
                     /**
-                     *
-                     * @param nodes
-                     * @param copy
-                     * @param targetItem
+                     * Overriding to delegate drop handling to the WindowManager
+                     * @override
                      */
                     onDropInternal: function(nodes, copy, targetItem) {
                         connect.publish('tabshare/tab/moveInternal',
-                            [this, nodes, copy, targetItem]);
+                            [this, nodes, targetItem]);
                     },
+
+                    /**
+                     * Overriding to delegate drop handling to the WindowManager
+                     * @override
+                     */
                     onDropExternal: function(sourceSource, nodes, copy, targetItem) {
                         connect.publish('tabshare/tab/moveExternal',
-                            [this, sourceSource, nodes, copy, targetItem]);
+                            [this, sourceSource, nodes, targetItem]);
                     }
-                }
+                },
+                reselect: {} // Used for reselecting rows after the grid refreshes
             }, this.gridNode);
+            // Hook before grid refresh in order to save currently selected tabs
+            aspect.before(this.grid, 'refresh', function() {
+                this.reselect = lang.clone(this.selection);
+            });
+            // Reselect the tabs after the grid has re-rendered!
+            aspect.after(this.grid, 'renderArray', function(rowsRendered) {
+                Deferred.when(rowsRendered, lang.hitch(this, function() {
+                    array.forEach(Object.keys(this.reselect), this.select, this);
+                }));
+
+                return rowsRendered;
+            });
 
             // Make the WindowContainer draggable
             this.moveHandle = new Moveable(this.domNode, {
@@ -111,7 +149,7 @@ define([
         /**
          * Returns whether this window has a tab with the given ID
          * @param {number} tabId The tab ID to search for
-         * @return {Boolean} Whether this window has a tab with the given ID
+         * @return {boolean} Whether this window has a tab with the given ID
          */
         hasTab: function(tabId) {
             // Quick way of looking up a tab ID - tab ID is used as the store's index field
@@ -148,7 +186,10 @@ define([
                         id: tab.id,
                         index: tab.index,
                         title: tab.title,
-                        url: tab.url
+                        url: tab.url,
+                        // If no favicon found, use Chrome's default favicon
+                        favicon: tab.favIconUrl ? tab.favIconUrl
+                                                : 'chrome://favicon/' + tab.url
                     };
                 }));
                 this.grid.refresh();
