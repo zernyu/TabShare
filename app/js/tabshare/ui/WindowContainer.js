@@ -6,7 +6,7 @@ define([
     'dojo/dnd/move',
     'dojo/store/Observable',
     'tabshare/data/TabStore',
-    'tabshare/ui/Moveable', 'tabshare/ui/Mover',
+    'tabshare/ui/dnd/Moveable', 'tabshare/ui/dnd/Mover',
     'dojo/text!./templates/WindowContainer.html',
     'dgrid/extensions/DnD', 'dgrid/Keyboard', 'dgrid/OnDemandGrid', 'dgrid/Selection',
     'dijit/_FocusMixin', 'dijit/_TemplatedMixin', 'dijit/_WidgetBase', 'dijit/_WidgetsInTemplateMixin',
@@ -110,6 +110,8 @@ define([
                 deselectOnRefresh: false, // Keep selections across grid refreshes
                 allowSelectAll: true      // Enable ctrl+a selection
             }, this.gridNode);
+
+            // TODO: extend Selection.js to fix: 1) DND on multiple rows 2) removing removed tabs from selection object after refresh
 
             // Make the WindowContainer draggable
             this.moveHandle = new Moveable(this.domNode, {
