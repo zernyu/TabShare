@@ -1,13 +1,10 @@
 define([
     'module',
     'tabshare/ui/WindowContainer',
-    'dojo/_base/array', 'dojo/_base/connect', 'dojo/_base/declare', 'dojo/_base/lang', 'dojo/_base/window',
-    'dojo/aspect'
+    'dojo/_base/array', 'dojo/_base/connect', 'dojo/_base/declare', 'dojo/_base/lang', 'dojo/_base/window'
 ], function(module,
             WindowContainer,
-            array, connect, declare, lang, win,
-            aspect) {
-
+            array, connect, declare, lang, win) {
     /**
      * This is the manager that will handle creating/updating/removing WindowContainers, which
      * are representations of the browser's open windows and its tabs
