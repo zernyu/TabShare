@@ -2,7 +2,7 @@ define([
     'module',
     'dojo/_base/array', 'dojo/_base/connect', 'dojo/_base/declare', 'dojo/_base/Deferred', 'dojo/_base/html', 'dojo/_base/lang',
     'dojo/aspect',
-    'dojo/dom-construct',
+    'dojo/dom-construct', 'dojo/dom-style',
     'dojo/dnd/move',
     'dojo/store/Observable',
     'tabshare/data/TabStore',
@@ -15,7 +15,7 @@ define([
 ], function(module,
             array, connect, declare, Deferred, html, lang,
             aspect,
-            domConstruct,
+            domConstruct, domStyle,
             move,
             Observable,
             TabStore,
@@ -32,6 +32,8 @@ define([
     return declare(module.id.replace(/\//g, '.'), [_WidgetBase, _FocusMixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: template,
         baseClass: 'windowContainer',
+        focusedClass: 'focused',
+        classPath: module.id,
 
         titleBar: null,   // Reference to the title bar node
         gridNode: null,   // Reference to the dgrid node
@@ -93,7 +95,7 @@ define([
                      * @override
                      */
                     onDropInternal: function(nodes, copy, targetItem) {
-                        connect.publish('tabshare/tab/moveInternal',
+                        connect.publish(this.classPath + '/moveInternal',
                             [this, nodes, targetItem]);
                     },
 
@@ -102,7 +104,7 @@ define([
                      * @override
                      */
                     onDropExternal: function(sourceSource, nodes, copy, targetItem) {
-                        connect.publish('tabshare/tab/moveExternal',
+                        connect.publish(this.classPath + '/moveExternal',
                             [this, sourceSource, nodes, targetItem]);
                     }
                 },
@@ -157,6 +159,14 @@ define([
         },
 
         /**
+         * Handler for when the WindowContainer is focused.
+         */
+        onFocus: function() {
+            // Let the WindowManager know this WindowContainer was focused
+            connect.publish(this.classPath + '/focus', [this]);
+        },
+
+        /**
          * Handler for Tab events
          * @param {string}       event  The event that was fired
          * @param {(Tab|number)} tab    Reference to a tab or its ID
@@ -194,6 +204,14 @@ define([
                 }));
                 this.grid.refresh();
             }));
+        },
+
+        /**
+         * Setter for the Window's z-index. Pretty much a convenience method
+         * @param {number} zIndex The z-index to set on this window's DOM node
+         */
+        _setZIndexAttr: function(zIndex) {
+            domStyle.set(this.domNode, 'z-index', zIndex);
         }
     });
 });

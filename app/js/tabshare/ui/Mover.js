@@ -1,13 +1,15 @@
 define([
-    'dojo',
+    'dojo/_base/declare',
     'dojo/dnd/Mover',
     'dojo/touch'
-], function(dojo, Mover, touch) {
+], function(declare,
+            Mover,
+            touch) {
 
     /**
      * Ghetto patch to fix superglue bug when right clicking
      */
-    return dojo.declare([Mover], {
+    return declare([Mover], {
         _onMouseClickHandle: null,
 
         constructor: function(node, e, host) {

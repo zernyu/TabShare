@@ -1,21 +1,26 @@
 define([
     'module',
-    'dojo/_base/array', 'dojo/_base/connect', 'dojo/_base/declare', 'dojo/_base/lang', 'dojo/_base/window'
+    'tabshare/ui/WindowContainer',
+    'dojo/_base/array', 'dojo/_base/connect', 'dojo/_base/declare', 'dojo/_base/lang', 'dojo/_base/window',
+    'dojo/aspect'
 ], function(module,
-            array, connect, declare, lang, win) {
+            WindowContainer,
+            array, connect, declare, lang, win,
+            aspect) {
 
     /**
      * This is the manager that will handle creating/updating/removing WindowContainers, which
      * are representations of the browser's open windows and its tabs
      */
     return declare(module.id.replace(/\//g, '.'), null, {
-        windowMap: {},  // A map of window IDs to WindowContainers
+        windowMap: {}, // A map of window IDs to WindowContainers
 
         /**
          * Register Chrome events and handlers in the constructor
          * @constructor
          */
         constructor: function() {
+            // Add listeners to Chrome Tab events
             var tabEvents = [
                 'onAttached',
                 'onCreated',
@@ -24,25 +29,57 @@ define([
                 'onRemoved',
                 'onUpdated'
             ];
-
             array.forEach(tabEvents, function(event) {
                 chrome.tabs[event].addListener(lang.hitch(this, this.onTabEvent, event));
             }, this);
 
+            // Add listeners to Chrome Window events
             var windowEvents = [
                 'onCreated',
                 'onRemoved'
             ];
-
             array.forEach(windowEvents, function(event) {
                 chrome.windows[event].addListener(lang.hitch(this, this.onWindowEvent, event));
             }, this);
 
-            connect.subscribe('tabshare/tab/moveInternal', function(source, nodes, copy, targetItem){
-                // TODO
+            // Handler for dragging and dropping tabs within the same WindowContainer
+            connect.subscribe(WindowContainer.prototype.classPath + '/moveInternal', this, function(source, nodes, targetItem){
+                var grid = source.grid;
+                var windowId = grid.windowId;
+                var window = this.windowMap[windowId];
+
+                // Get the target index to give the tabs being moved
+                var targetIndex;
+                if (targetItem !== undefined) {
+                    // If there is a targetItem, we are dragging the tab(s) in front of another tab
+                    targetIndex = targetItem.index;
+
+                    // Grab the current index of the first tab in the array being dropped
+                    var firstIndex = grid.row(nodes[0]).data.index;
+                    if (firstIndex < targetIndex) {
+                        // If moving the tab to the left, the target index should be 1 less
+                        targetIndex--;
+                    }
+                } else {
+                    // Otherwise we are dragging the tab(s) to the end
+                    targetIndex = window.store.data.length;
+                }
+
+                // Finally, move the tabs!
+                array.forEach(nodes, function(node) {
+                    var tabId = grid.row(node).data.id;
+                    chrome.tabs.move(tabId, {index: targetIndex});
+                });
+
+            });
+
+            // Handler for dragging and dropping tabs between WindowContainer
+            connect.subscribe(WindowContainer.prototype.classPath + '/moveExternal', this, function(targetSource, sourceSource, nodes, targetItem){
                 console.log(arguments);
             });
-            connect.subscribe('tabshare/tab/moveExternal', function(targetSource, sourceSource, nodes, copy, targetItem){
+
+            // Handler for when a WindowContainer is focused
+            connect.subscribe(WindowContainer.prototype.classPath + '/moveExternal', this, function(targetSource, sourceSource, nodes, targetItem){
                 console.log(arguments);
             });
         },
@@ -53,8 +90,9 @@ define([
          */
         addWindow: function(windowId) {
             // Create a new WindowContainer to represent the Window being managed
-            var windowContainer = new tabshare.ui.WindowContainer({
-                windowId: windowId
+            var windowContainer = new WindowContainer({
+                windowId: windowId,
+                zIndex: Object.keys(this.windowMap).length
             });
             windowContainer.placeAt(win.body());
             windowContainer.startup();
