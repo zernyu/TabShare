@@ -11,6 +11,7 @@ define([
      */
     return declare(module.id.replace(/\//g, '.'), null, {
         windowMap: {}, // A map of window IDs to WindowContainers
+        tabId: null,   // The ID of the tab this WindowManager is in
 
         /**
          * Register Chrome events and handlers in the constructor
@@ -47,6 +48,11 @@ define([
 
             // Add listener for when a WindowContainer is focused
             connect.subscribe(WindowContainer.prototype.classPath + '/focus', this, this.focusWindow);
+
+            // Grab the ID of the tab this WindowContainer is in
+            chrome.tabs.getCurrent(lang.hitch(this, function(tab) {
+                this.tabId = tab.id;
+            }));
         },
 
         /**
@@ -112,8 +118,16 @@ define([
             // Finally, move the tabs!
             array.forEach(nodes, function(node) {
                 var tabId = sourceWindow.grid.row(node).data.id;
-                chrome.tabs.move(tabId, {windowId: grid.windowId, index: targetIndex});
-            });
+                chrome.tabs.move(tabId, {windowId: grid.windowId, index: targetIndex},
+                    lang.hitch(this, function() {
+                        // If the user is dragging this dashbaord page, keep it focused!
+                        if (tabId === this.tabId) {
+                            chrome.tabs.update(tabId, {active: true});
+                            chrome.windows.update(grid.windowId, {focused: true});
+                        }
+                    })
+                );
+            }, this);
         },
 
         /**
