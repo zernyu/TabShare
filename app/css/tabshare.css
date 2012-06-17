@@ -52,13 +52,6 @@ body, html {
 
 .windowContainer
     .dgrid-scroller
-        .dgrid-row {
-    background-color: #fff;
-    border-radius: 5px;
-}
-
-.windowContainer
-    .dgrid-scroller
         .dgrid-row.dojoDndItemAfter {
     border-bottom: 16px solid #ccc;
 }
@@ -79,8 +72,7 @@ body, html {
     .dgrid-scroller
         .dgrid-row
             .dgrid-cell {
-    border-right: none;
-    border-left: none;
+    border: none;
     padding: 5px;
 }
 

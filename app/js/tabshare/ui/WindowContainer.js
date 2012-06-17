@@ -107,20 +107,9 @@ define([
                             [this, sourceSource, nodes, targetItem]);
                     })
                 },
-                reselect: {} // Used for reselecting rows after the grid refreshes
+                deselectOnRefresh: false, // Keep selections across grid refreshes
+                allowSelectAll: true      // Enable ctrl+a selection
             }, this.gridNode);
-            // Hook before grid refresh in order to save currently selected tabs
-            aspect.before(this.grid, 'refresh', function() {
-                this.reselect = lang.clone(this.selection);
-            });
-            // Reselect the tabs after the grid has re-rendered!
-            aspect.after(this.grid, 'renderArray', function(rowsRendered) {
-                Deferred.when(rowsRendered, lang.hitch(this, function() {
-                    array.forEach(Object.keys(this.reselect), this.select, this);
-                }));
-
-                return rowsRendered;
-            });
 
             // Make the WindowContainer draggable
             this.moveHandle = new Moveable(this.domNode, {

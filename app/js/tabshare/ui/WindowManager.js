@@ -162,7 +162,7 @@ define([
             console.log(event, arguments);
 
             // Find the window that should be updated and call its Tab event handler
-            var windowId = info.newWindowId || info.oldWindowId;
+            var windowId = info && (info.newWindowId || info.oldWindowId);
             if (!windowId) {
                 windowId = this._findWindowIdByTab(tab);
             }
