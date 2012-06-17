@@ -35,7 +35,6 @@ define([
         focusedClass: 'focused',
         classPath: module.id,
 
-        titleBar: null,   // Reference to the title bar node
         gridNode: null,   // Reference to the dgrid node
 
         grid: null,       // Reference to the dgrid displaying the list of tabs
@@ -125,7 +124,6 @@ define([
 
             // Make the WindowContainer draggable
             this.moveHandle = new Moveable(this.domNode, {
-                handle: this.titleBar.domNode,
                 area: 'content',
                 within: true,
                 mover: Mover

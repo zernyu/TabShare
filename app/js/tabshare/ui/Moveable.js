@@ -8,7 +8,7 @@ define([
      */
     return declare([move.parentConstrainedMoveable], {
         onMouseDown: function(e){
-            if (e.button === 0) {
+            if (e.button === 0 && e.target === this.node) {
                 this.inherited(arguments);
             }
         }
