@@ -94,19 +94,19 @@ define([
                      * Overriding to delegate drop handling to the WindowManager
                      * @override
                      */
-                    onDropInternal: function(nodes, copy, targetItem) {
+                    onDropInternal: lang.hitch(this, function(nodes, copy, targetItem) {
                         connect.publish(this.classPath + '/moveInternal',
                             [this, nodes, targetItem]);
-                    },
+                    }),
 
                     /**
                      * Overriding to delegate drop handling to the WindowManager
                      * @override
                      */
-                    onDropExternal: function(sourceSource, nodes, copy, targetItem) {
+                    onDropExternal: lang.hitch(this, function(sourceSource, nodes, copy, targetItem) {
                         connect.publish(this.classPath + '/moveExternal',
                             [this, sourceSource, nodes, targetItem]);
-                    }
+                    })
                 },
                 reselect: {} // Used for reselecting rows after the grid refreshes
             }, this.gridNode);
@@ -212,6 +212,7 @@ define([
          */
         _setZIndexAttr: function(zIndex) {
             domStyle.set(this.domNode, 'z-index', zIndex);
+            this.zIndex = zIndex;
         }
     });
 });

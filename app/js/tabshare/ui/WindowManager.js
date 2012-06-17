@@ -42,46 +42,16 @@ define([
                 chrome.windows[event].addListener(lang.hitch(this, this.onWindowEvent, event));
             }, this);
 
-            // Handler for dragging and dropping tabs within the same WindowContainer
-            connect.subscribe(WindowContainer.prototype.classPath + '/moveInternal', this, function(source, nodes, targetItem){
-                var grid = source.grid;
-                var windowId = grid.windowId;
-                var window = this.windowMap[windowId];
+            // Add listener for dragging and dropping tabs within the same WindowContainer
+            connect.subscribe(WindowContainer.prototype.classPath + '/moveInternal', this, this.moveInternal);
 
-                // Get the target index to give the tabs being moved
-                var targetIndex;
-                if (targetItem !== undefined) {
-                    // If there is a targetItem, we are dragging the tab(s) in front of another tab
-                    targetIndex = targetItem.index;
-
-                    // Grab the current index of the first tab in the array being dropped
-                    var firstIndex = grid.row(nodes[0]).data.index;
-                    if (firstIndex < targetIndex) {
-                        // If moving the tab to the left, the target index should be 1 less
-                        targetIndex--;
-                    }
-                } else {
-                    // Otherwise we are dragging the tab(s) to the end
-                    targetIndex = window.store.data.length;
-                }
-
-                // Finally, move the tabs!
-                array.forEach(nodes, function(node) {
-                    var tabId = grid.row(node).data.id;
-                    chrome.tabs.move(tabId, {index: targetIndex});
-                });
-
-            });
-
-            // Handler for dragging and dropping tabs between WindowContainer
+            // Add listener for dragging and dropping tabs between WindowContainer
             connect.subscribe(WindowContainer.prototype.classPath + '/moveExternal', this, function(targetSource, sourceSource, nodes, targetItem){
                 console.log(arguments);
             });
 
-            // Handler for when a WindowContainer is focused
-            connect.subscribe(WindowContainer.prototype.classPath + '/moveExternal', this, function(targetSource, sourceSource, nodes, targetItem){
-                console.log(arguments);
-            });
+            // Add listener for when a WindowContainer is focused
+            connect.subscribe(WindowContainer.prototype.classPath + '/focus', this, this.focusWindow);
         },
 
         /**
@@ -99,6 +69,64 @@ define([
 
             // Keep track of the window in the window manager!
             this.windowMap[windowContainer.windowId] = windowContainer;
+        },
+
+        /**
+         * Move the WindowContainer into focus
+         * @param {WindowContainer} windowContainer The WindowContainer to move into focus
+         */
+        focusWindow: function(windowContainer) {
+            // Find the largest z-index out of all current WindowContainers
+            var largestIndex = 0;
+            for (var windowId in this.windowMap) {
+                if (!this.windowMap.hasOwnProperty(windowId)) {
+                    continue;
+                }
+
+                var window = this.windowMap[windowId];
+                if (window.get('zIndex') > largestIndex) {
+                    largestIndex = window.get('zIndex');
+                }
+            }
+
+            // Set the given WindowContainer's z-index to the highest value
+            windowContainer.set('zIndex', largestIndex + 1);
+        },
+
+        /**
+         * Move the selected tabs in the window to a new position in the window
+         * @param {WindowContainer} windowContainer The window the tabs are in
+         * @param {NodeList}        nodes           The tabs to be moved
+         * @param {Tab=}             targetItem     The tab to be moved in front of
+         */
+        moveInternal: function(windowContainer, nodes, targetItem) {
+            var grid = windowContainer.grid;
+            var windowId = grid.windowId;
+            var window = this.windowMap[windowId];
+
+            // Get the target index to give the tabs being moved
+            var targetIndex;
+            if (targetItem !== undefined) {
+                // If there is a targetItem, we are dragging the tab(s) in front of another tab
+                targetIndex = targetItem.index;
+
+                // Grab the current index of the first tab in the array being dropped
+                var firstIndex = grid.row(nodes[0]).data.index;
+                if (firstIndex < targetIndex) {
+                    // If moving the tab to the left, the target index should be 1 less
+                    targetIndex--;
+                }
+            } else {
+                // Otherwise we are dragging the tab(s) to the end
+                targetIndex = window.store.data.length;
+            }
+
+            // Finally, move the tabs!
+            array.forEach(nodes, function(node) {
+                var tabId = grid.row(node).data.id;
+                chrome.tabs.move(tabId, {index: targetIndex});
+            });
+
         },
 
         /**
