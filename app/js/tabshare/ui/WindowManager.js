@@ -120,7 +120,7 @@ define([
                 var tabId = sourceWindow.grid.row(node).data.id;
                 chrome.tabs.move(tabId, {windowId: targetGrid.windowId, index: targetIndex++},
                     lang.hitch(this, function() {
-                        // If the user is dragging this dashbaord page, keep it focused!
+                        // If the user is dragging this dashboard page, keep it focused!
                         if (tabId === this.tabId) {
                             chrome.tabs.update(tabId, {active: true});
                             chrome.windows.update(targetGrid.windowId, {focused: true});
@@ -139,8 +139,10 @@ define([
         moveInternal: function(targetSource, nodes, targetItem) {
             var targetGrid = targetSource.grid;
 
+            var targetIndex;        // The target index to move the nodes to
+            var moveRight = false;  // If the user is moving tabs to the left or right
+
             // Get the target index to give the tabs being moved
-            var targetIndex;
             if (targetItem) {
                 // If there is a targetItem, we are dragging the tab(s) in front of another tab
                 targetIndex = targetItem.index;
@@ -148,8 +150,9 @@ define([
                 // Grab the current index of the first tab in the array being dropped
                 var firstIndex = targetGrid.row(nodes[0]).data.index;
                 if (firstIndex < targetIndex) {
-                    // If moving the tab to the left, the target index should be 1 less
+                    // If moving the tab to the right, the target index should be 1 less
                     targetIndex--;
+                    moveRight = true;
                 }
             } else {
                 // Otherwise we are dragging the tab(s) to the end
@@ -159,7 +162,13 @@ define([
             // Finally, move the tabs!
             array.forEach(nodes, function(node) {
                 var tabId = targetGrid.row(node).data.id;
-                chrome.tabs.move(tabId, {index: targetIndex++});
+                chrome.tabs.move(tabId, {index: targetIndex});
+
+                // If moving tabs to the left of their previous position,
+                // increase the target index for each tab moved
+                if (!moveRight) {
+                    targetIndex++;
+                }
             });
         },
 
