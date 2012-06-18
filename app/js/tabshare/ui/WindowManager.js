@@ -1,11 +1,9 @@
 define([
     'module',
     'tabshare/ui/WindowContainer',
-    'tabshare/ui/grid/_SourceMixin',
     'dojo/_base/array', 'dojo/_base/connect', 'dojo/_base/declare', 'dojo/_base/lang', 'dojo/_base/window'
 ], function(module,
             WindowContainer,
-            _SourceMixin,
             array, connect, declare, lang, win) {
     /**
      * This is the manager that will handle creating/updating/removing WindowContainers, which
@@ -43,13 +41,13 @@ define([
             }, this);
 
             // Add listener for dragging and dropping tabs between WindowContainer
-            connect.subscribe(_SourceMixin.prototype.classPath + '/moveExternal', this, this.moveExternal);
+            connect.subscribe('tabshare/ui/WindowContainer/moveExternal', this, this.moveExternal);
 
             // Add listener for dragging and dropping tabs within the same WindowContainer
-            connect.subscribe(_SourceMixin.prototype.classPath + '/moveInternal', this, this.moveInternal);
+            connect.subscribe('tabshare/ui/WindowContainer/moveInternal', this, this.moveInternal);
 
             // Add listener for when a WindowContainer is focused
-            connect.subscribe(_SourceMixin.prototype.classPath + '/focus', this, this.focusWindow);
+            connect.subscribe('tabshare/ui/WindowContainer/focus', this, this.focusWindow);
 
             // Grab the ID of the tab this WindowContainer is in
             chrome.tabs.getCurrent(lang.hitch(this, function(tab) {
@@ -98,13 +96,13 @@ define([
 
         /**
          * Move the selected tabs to a another window
-         * @param {WindowContainer} targetWindow    The window to move the tabs to
+         * @param {Source}          targetSource    The dgrid Source to move the tabs to
          * @param {Source}          sourceSource    The dgrid Source containing the tabs
          * @param {NodeList}        nodes           The tabs to be moved
          * @param {Tab=}            targetItem      The tab to be moved in front of
          */
-        moveExternal: function(targetWindow, sourceSource, nodes, targetItem){
-            var grid = targetWindow.grid;
+        moveExternal: function(targetSource, sourceSource, nodes, targetItem){
+            var targetGrid = targetSource.grid;
             var sourceWindow = this.windowMap[sourceSource.grid.windowId];
 
             // Get the target index to give the tabs being moved
@@ -114,18 +112,18 @@ define([
                 targetIndex = targetItem.index;
             } else {
                 // Otherwise we are dragging the tab(s) to the end
-                targetIndex = targetWindow.store.data.length;
+                targetIndex = targetGrid.store.data.length;
             }
 
             // Finally, move the tabs!
             array.forEach(nodes, function(node) {
                 var tabId = sourceWindow.grid.row(node).data.id;
-                chrome.tabs.move(tabId, {windowId: grid.windowId, index: targetIndex++},
+                chrome.tabs.move(tabId, {windowId: targetGrid.windowId, index: targetIndex++},
                     lang.hitch(this, function() {
                         // If the user is dragging this dashbaord page, keep it focused!
                         if (tabId === this.tabId) {
                             chrome.tabs.update(tabId, {active: true});
-                            chrome.windows.update(grid.windowId, {focused: true});
+                            chrome.windows.update(targetGrid.windowId, {focused: true});
                         }
                     })
                 );
@@ -134,12 +132,12 @@ define([
 
         /**
          * Move the selected tabs in the window to a new position in the window
-         * @param {WindowContainer} windowContainer The window the tabs are in
+         * @param {Source}          targetSource    The dgrid Source the tabs are in
          * @param {NodeList}        nodes           The tabs to be moved
-         * @param {Tab=}             targetItem     The tab to be moved in front of
+         * @param {Tab=}            targetItem      The tab to be moved in front of
          */
-        moveInternal: function(windowContainer, nodes, targetItem) {
-            var grid = windowContainer.grid;
+        moveInternal: function(targetSource, nodes, targetItem) {
+            var targetGrid = targetSource.grid;
 
             // Get the target index to give the tabs being moved
             var targetIndex;
@@ -148,19 +146,19 @@ define([
                 targetIndex = targetItem.index;
 
                 // Grab the current index of the first tab in the array being dropped
-                var firstIndex = grid.row(nodes[0]).data.index;
+                var firstIndex = targetGrid.row(nodes[0]).data.index;
                 if (firstIndex < targetIndex) {
                     // If moving the tab to the left, the target index should be 1 less
                     targetIndex--;
                 }
             } else {
                 // Otherwise we are dragging the tab(s) to the end
-                targetIndex = windowContainer.store.data.length;
+                targetIndex = targetGrid.store.data.length;
             }
 
             // Finally, move the tabs!
             array.forEach(nodes, function(node) {
-                var tabId = grid.row(node).data.id;
+                var tabId = targetGrid.row(node).data.id;
                 chrome.tabs.move(tabId, {index: targetIndex++});
             });
         },

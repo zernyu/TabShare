@@ -35,7 +35,6 @@ define([
         templateString: template,
         baseClass: 'windowContainer',
         focusedClass: 'focused',
-        classPath: module.id,
 
         gridNode: null,   // Reference to the dgrid node
 
@@ -134,7 +133,7 @@ define([
          */
         onFocus: function() {
             // Let the WindowManager know this WindowContainer was focused
-            connect.publish(this.classPath + '/focus', [this]);
+            connect.publish('tabshare/ui/WindowContainer/focus', [this]);
         },
 
         /**
