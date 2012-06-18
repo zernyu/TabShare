@@ -107,7 +107,7 @@ define([
 
             // Get the target index to give the tabs being moved
             var targetIndex;
-            if (targetItem !== undefined) {
+            if (targetItem) {
                 // If there is a targetItem, we are dragging the tab(s) in front of another tab
                 targetIndex = targetItem.index;
             } else {
@@ -141,7 +141,7 @@ define([
 
             // Get the target index to give the tabs being moved
             var targetIndex;
-            if (targetItem !== undefined) {
+            if (targetItem) {
                 // If there is a targetItem, we are dragging the tab(s) in front of another tab
                 targetIndex = targetItem.index;
 

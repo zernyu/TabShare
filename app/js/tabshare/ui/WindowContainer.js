@@ -7,8 +7,9 @@ define([
     'dojo/store/Observable',
     'tabshare/data/TabStore',
     'tabshare/ui/dnd/Moveable', 'tabshare/ui/dnd/Mover',
+    'tabshare/ui/grid/Selection', 'tabshare/ui/grid/_SourceMixin',
     'dojo/text!./templates/WindowContainer.html',
-    'dgrid/extensions/DnD', 'dgrid/Keyboard', 'dgrid/OnDemandGrid', 'dgrid/Selection',
+    'dgrid/extensions/DnD', 'dgrid/Keyboard', 'dgrid/OnDemandGrid',
     'dijit/_FocusMixin', 'dijit/_TemplatedMixin', 'dijit/_WidgetBase', 'dijit/_WidgetsInTemplateMixin',
         'dijit/layout/BorderContainer',
         'dijit/layout/ContentPane'
@@ -20,8 +21,9 @@ define([
             Observable,
             TabStore,
             Moveable, Mover,
+            Selection, _SourceMixin,
             template,
-            DnD, Keyboard, Grid, Selection,
+            DnD, Keyboard, Grid,
             _FocusMixin, _TemplatedMixin, _WidgetBase, _WidgetsInTemplateMixin) {
 
     /**
@@ -88,25 +90,7 @@ define([
                     }
                 ],
                 showHeader: false, // Hide the grid header
-                dndParams: { // Override some drag and drop callbacks
-                    /**
-                     * Overriding to delegate drop handling to the WindowManager
-                     * @override
-                     */
-                    onDropInternal: lang.hitch(this, function(nodes, copy, targetItem) {
-                        connect.publish(this.classPath + '/moveInternal',
-                            [this, nodes, targetItem]);
-                    }),
-
-                    /**
-                     * Overriding to delegate drop handling to the WindowManager
-                     * @override
-                     */
-                    onDropExternal: lang.hitch(this, function(sourceSource, nodes, copy, targetItem) {
-                        connect.publish(this.classPath + '/moveExternal',
-                            [this, sourceSource, nodes, targetItem]);
-                    })
-                },
+                dndParams: _SourceMixin, // Override some drag and drop callbacks
                 deselectOnRefresh: false, // Keep selections across grid refreshes
                 allowSelectAll: true      // Enable ctrl+a selection
             }, this.gridNode);
