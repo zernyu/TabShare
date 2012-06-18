@@ -58,12 +58,6 @@ body, html {
 
 .windowContainer
     .dgrid-scroller
-        .dgrid-row.dgrid-selected {
-    background: #fff;
-}
-
-.windowContainer
-    .dgrid-scroller
         .dgrid-row.dgrid-selected
             .dgrid-cell.field-title
                 h1 {
@@ -93,13 +87,22 @@ body, html {
 .windowContainer
     .dgrid-scroller
         .dgrid-row
+            .dgrid-cell,
+.dojoDndAvatar
+    .dojoDndAvatarItem
+        .dgrid-row
             .dgrid-cell {
     border: none;
     padding: 5px;
+    background: #fff;
 }
 
 .windowContainer
     .dgrid-scroller
+        .dgrid-row
+            .dgrid-cell.field-favicon,
+.dojoDndAvatar
+    .dojoDndAvatarItem
         .dgrid-row
             .dgrid-cell.field-favicon {
     width: 16px;
@@ -108,6 +111,11 @@ body, html {
 
 .windowContainer
     .dgrid-scroller
+        .dgrid-row
+            .dgrid-cell.field-title
+                h1,
+.dojoDndAvatar
+    .dojoDndAvatarItem
         .dgrid-row
             .dgrid-cell.field-title
                 h1 {
@@ -124,6 +132,11 @@ body, html {
     .dgrid-scroller
         .dgrid-row
             .dgrid-cell.field-title
+                h2,
+.dojoDndAvatar
+    .dojoDndAvatarItem
+        .dgrid-row
+            .dgrid-cell.field-title
                 h2 {
     white-space: nowrap;
     overflow: hidden;
@@ -134,4 +147,20 @@ body, html {
     line-height: 1em;
     color: rgba(0, 0, 0, 0.3);
     padding-top: 5px;
+}
+
+table.dojoDndAvatar {
+    font-size: 100%;
+    border-spacing: 0;
+}
+
+.dojoDndAvatar
+    .dojoDndAvatarHeader {
+    background: #fff;
+}
+
+.dojoDndAvatar
+    .dojoDndAvatarHeader
+        td {
+    height: 20px;
 }
