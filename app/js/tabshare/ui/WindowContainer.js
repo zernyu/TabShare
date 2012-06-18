@@ -95,8 +95,6 @@ define([
                 allowSelectAll: true      // Enable ctrl+a selection
             }, this.gridNode);
 
-            // TODO: extend Selection.js to fix: 1) DND on multiple rows 2) removing removed tabs from selection object after refresh
-
             // Make the WindowContainer draggable
             this.moveHandle = new Moveable(this.domNode, {
                 area: 'content',
