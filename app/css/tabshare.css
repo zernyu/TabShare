@@ -20,6 +20,12 @@ body, html {
 ::-webkit-scrollbar-thumb:hover {
     background-color: rgba(0, 0, 0, 0.7);
 }
+
+.dgrid-content:focus,
+.dgrid-cell:focus {
+    outline: none;
+}
+
 /* TODO: uncomment after implementing default window placement algorithm
 .windowContainer {
     position: absolute;
@@ -52,6 +58,20 @@ body, html {
 
 .windowContainer
     .dgrid-scroller
+        .dgrid-row.dgrid-selected {
+    background: #fff;
+}
+
+.windowContainer
+    .dgrid-scroller
+        .dgrid-row.dgrid-selected
+            .dgrid-cell.field-title
+                h1 {
+    color: #5ba0ff;
+}
+
+.windowContainer
+    .dgrid-scroller
         .dgrid-row.dojoDndItemAfter {
     border-bottom: 16px solid #ccc;
 }
@@ -64,8 +84,10 @@ body, html {
 
 .windowContainer
     .dgrid-scroller
-        .dgrid-row.dojoDndItemOver {
-    background-color: #eee;
+        .dgrid-row.dojoDndItemOver:not(.dgrid-selected)
+            .dgrid-cell.field-title
+                h1 {
+    color: #999;
 }
 
 .windowContainer
