@@ -1,9 +1,11 @@
 define([
     'module',
     'tabshare/ui/WindowContainer',
+    'tabshare/ui/grid/_SourceMixin',
     'dojo/_base/array', 'dojo/_base/connect', 'dojo/_base/declare', 'dojo/_base/lang', 'dojo/_base/window'
 ], function(module,
             WindowContainer,
+            _SourceMixin,
             array, connect, declare, lang, win) {
     /**
      * This is the manager that will handle creating/updating/removing WindowContainers, which
@@ -41,13 +43,13 @@ define([
             }, this);
 
             // Add listener for dragging and dropping tabs between WindowContainer
-            connect.subscribe(WindowContainer.prototype.classPath + '/moveExternal', this, this.moveExternal);
+            connect.subscribe(_SourceMixin.prototype.classPath + '/moveExternal', this, this.moveExternal);
 
             // Add listener for dragging and dropping tabs within the same WindowContainer
-            connect.subscribe(WindowContainer.prototype.classPath + '/moveInternal', this, this.moveInternal);
+            connect.subscribe(_SourceMixin.prototype.classPath + '/moveInternal', this, this.moveInternal);
 
             // Add listener for when a WindowContainer is focused
-            connect.subscribe(WindowContainer.prototype.classPath + '/focus', this, this.focusWindow);
+            connect.subscribe(_SourceMixin.prototype.classPath + '/focus', this, this.focusWindow);
 
             // Grab the ID of the tab this WindowContainer is in
             chrome.tabs.getCurrent(lang.hitch(this, function(tab) {
@@ -118,7 +120,7 @@ define([
             // Finally, move the tabs!
             array.forEach(nodes, function(node) {
                 var tabId = sourceWindow.grid.row(node).data.id;
-                chrome.tabs.move(tabId, {windowId: grid.windowId, index: targetIndex},
+                chrome.tabs.move(tabId, {windowId: grid.windowId, index: targetIndex++},
                     lang.hitch(this, function() {
                         // If the user is dragging this dashbaord page, keep it focused!
                         if (tabId === this.tabId) {
@@ -159,7 +161,7 @@ define([
             // Finally, move the tabs!
             array.forEach(nodes, function(node) {
                 var tabId = grid.row(node).data.id;
-                chrome.tabs.move(tabId, {index: targetIndex});
+                chrome.tabs.move(tabId, {index: targetIndex++});
             });
         },
 
