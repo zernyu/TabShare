@@ -146,6 +146,8 @@ define([
         moveInternal: function(targetSource, nodes, targetItem) {
             var targetGrid = targetSource.grid;
 
+		// TODO: pinned tabs work differently!!
+
             var targetIndex;        // The target index to move the nodes to
             var moveRight = false;  // If the user is moving tabs to the left or right
 
