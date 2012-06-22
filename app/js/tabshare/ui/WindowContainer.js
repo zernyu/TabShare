@@ -8,6 +8,7 @@ define([
     'tabshare/data/TabStore',
     'tabshare/ui/dnd/Moveable', 'tabshare/ui/dnd/Mover',
     'tabshare/ui/grid/Selection', 'tabshare/ui/grid/_SourceMixin',
+    'tabshare/util/delay',
     'dojo/text!./templates/WindowContainer.html',
     'dgrid/extensions/DnD', 'dgrid/Keyboard', 'dgrid/OnDemandGrid',
     'dijit/_FocusMixin', 'dijit/_TemplatedMixin', 'dijit/_WidgetBase', 'dijit/_WidgetsInTemplateMixin',
@@ -22,6 +23,7 @@ define([
             TabStore,
             Moveable, Mover,
             Selection, _SourceMixin,
+            delay,
             template,
             DnD, Keyboard, Grid,
             _FocusMixin, _TemplatedMixin, _WidgetBase, _WidgetsInTemplateMixin) {
@@ -160,20 +162,27 @@ define([
          * Refresh this window's open tabs
          */
         refresh: function() {
-            chrome.tabs.getAllInWindow(this.windowId, lang.hitch(this, function(tabs) {
-                this.grid.store.setData(array.map(tabs, function(tab) {
-                    return {
-                        id: tab.id,
-                        index: tab.index,
-                        title: tab.title,
-                        url: tab.url,
-                        // If no favicon found, use Chrome's default favicon
-                        favicon: tab.favIconUrl ? tab.favIconUrl
-                                                : 'chrome://favicon/' + tab.url
-                    };
-                }));
-                this.grid.refresh();
-            }));
+            // Debounce the actual refresh functionality
+            if (!this._refresh) {
+                this._refresh = delay.debounce(function() {
+                    chrome.tabs.getAllInWindow(this.windowId, lang.hitch(this, function(tabs) {
+                        this.grid.store.setData(array.map(tabs, function(tab) {
+                            return {
+                                id: tab.id,
+                                index: tab.index,
+                                title: tab.title,
+                                url: tab.url,
+                                // If no favicon found, use Chrome's default favicon
+                                favicon: tab.favIconUrl ? tab.favIconUrl
+                                                        : 'chrome://favicon/' + tab.url
+                            };
+                        }));
+                        this.grid.refresh();
+                    }));
+                }, 150, this);
+            }
+
+            this._refresh();
         },
 
         /**
