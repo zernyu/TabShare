@@ -103,7 +103,9 @@ define([
          */
         moveExternal: function(targetSource, sourceSource, nodes, targetItem){
             var targetGrid = targetSource.grid;
-            var sourceWindow = this.windowMap[sourceSource.grid.windowId];
+            var sourceGrid = sourceSource.grid;
+
+            var sourceWindow = this.windowMap[sourceGrid.windowId];
 
             // Get the target index to give the tabs being moved
             var targetIndex;
@@ -115,11 +117,16 @@ define([
                 targetIndex = targetGrid.store.data.length;
             }
 
+            // Clear the grids' selections to prevent odd functionality
+            sourceGrid.clearSelection();
+            targetGrid.clearSelection();
+
             // Finally, move the tabs!
             array.forEach(nodes, function(node) {
                 var tabId = sourceWindow.grid.row(node).data.id;
                 chrome.tabs.move(tabId, {windowId: targetGrid.windowId, index: targetIndex++},
                     lang.hitch(this, function() {
+                        // TODO: reselect tabs in the target window
                         // If the user is dragging this dashboard page, keep it focused!
                         if (tabId === this.tabId) {
                             chrome.tabs.update(tabId, {active: true});
