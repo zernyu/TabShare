@@ -72,8 +72,8 @@ define([
                     // only clear selection for left clicks on mouse up if clicking into an
                     // already selected row
                     if ((mode == "extended" && event.button != 2
-                        && ((!alreadySelected && event.type == "mousedown" && !ctrlKey))
-                            || (alreadySelected && event.type == "mouseup")) ||
+                        && ((!alreadySelected && event.type == "mousedown" && !ctrlKey)
+                            || (alreadySelected && event.type == "mouseup"))) ||
                         (event.button == 2 && !(this.selection[rowObj.id]))) {
                         this.clearSelection(rowObj.id);
                     }
