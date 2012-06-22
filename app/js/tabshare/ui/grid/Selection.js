@@ -73,10 +73,12 @@ define([
                     // already selected row
                     if ((mode == "extended" && event.button != 2
                         && ((!alreadySelected && event.type == "mousedown" && !ctrlKey)
-                            || (alreadySelected && event.type == "mouseup"))) ||
+                            || (alreadySelected && (event.type == "mouseup" || (event.type == "mousedown" && event.shiftKey))))) ||
                         (event.button == 2 && !(this.selection[rowObj.id]))) {
                         this.clearSelection(rowObj.id);
                     }
+                    // TODO: disable selection of selected row with ctrl click mousedown
+
                     if (!event.shiftKey) {
                         // null == toggle; undefined == true;
                         lastRow = value = ctrlKey ? null : undefined;
