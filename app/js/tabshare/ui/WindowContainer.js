@@ -1,7 +1,7 @@
 define([
     'module',
     'dojo/_base/array', 'dojo/_base/connect', 'dojo/_base/declare', 'dojo/_base/Deferred', 'dojo/_base/html', 'dojo/_base/lang',
-    'dojo/aspect',
+    'dojo/aspect', 'dojo/on',
     'dojo/dom-construct', 'dojo/dom-style',
     'dojo/dnd/move',
     'dojo/store/Observable',
@@ -16,7 +16,7 @@ define([
         'dijit/layout/ContentPane'
 ], function(module,
             array, connect, declare, Deferred, html, lang,
-            aspect,
+            aspect, on,
             domConstruct, domStyle,
             move,
             Observable,
@@ -43,6 +43,7 @@ define([
         grid: null,       // Reference to the dgrid displaying the list of tabs
         store: null,      // Reference to the store containing the list of tabs
         moveHandle: null, // Reference to the Moveable handle
+        clickSignal: null,// Reference to the dojo/on signal for double clicking the grid
 
         windowId: null,   // The ID of this window
 
@@ -96,6 +97,9 @@ define([
                 allowSelectAll: true      // Enable ctrl+a selection
             }, this.gridNode);
 
+            // Connect the double click event to the grid to switch to the double clicked tab
+            this.clickSignal = on(this.grid.domNode, 'dblclick', lang.hitch(this, this.onDoubleClick));
+
             // Make the WindowContainer draggable
             this.moveHandle = new Moveable(this.domNode, {
                 area: 'content',
@@ -116,6 +120,7 @@ define([
         uninitialize: function() {
             this.grid.destroy();
             this.moveHandle.destroy();
+            this.clickSignal.remove();
 
             this.inherited(arguments);
         },
@@ -128,6 +133,19 @@ define([
         hasTab: function(tabId) {
             // Quick way of looking up a tab ID - tab ID is used as the store's index field
             return tabId in this.store.index;
+        },
+
+        /**
+         * When double clicking on a grid row, activate and focus the corresponding tab
+         * @param {MouseEvent} event The click event
+         */
+        onDoubleClick: function(event) {
+            // Focus and switch to the double clicked tab if a valid grid row was double clicked
+            var row = this.grid.row(event.target);
+            if (row) {
+                chrome.tabs.update(row.data.id, {active: true});
+                chrome.windows.update(this.windowId, {focused: true});
+            }
         },
 
         /**
