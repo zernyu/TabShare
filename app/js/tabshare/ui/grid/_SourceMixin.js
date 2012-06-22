@@ -5,6 +5,8 @@ define([
      * A mixin for dgrid's DND Source to override some functions
      */
     return {
+        delay: 10, // Don't start drag unless if mouse moves over 10px
+
         /**
          * Overriding to prevent DND happening if the user isn't clicking on a row
          * @override
