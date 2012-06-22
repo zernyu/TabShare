@@ -78,7 +78,7 @@ body, html {
 
 .windowContainer
     .dgrid-scroller
-        .dgrid-row.dojoDndItemOver:not(.dgrid-selected)
+        .dgrid-row.dojoDndItemOver:not(.dgrid-selected):not(.dojoDndItemAfter):not(.dojoDndItemBefore)
             .dgrid-cell.field-title
                 h1 {
     color: #999;
