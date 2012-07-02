@@ -1,6 +1,11 @@
 define([
-    'dojo/_base/connect'
-], function(connect) {
+    'dojo/_base/connect', 'dojo/_base/query',
+    'dojo/dom-geometry', 'dojo/dom-style',
+    'dojo/dnd/Manager', 'dojo/dnd/Source'
+], function(connect, query,
+            domGeometry, domStyle,
+            Manager, Source) {
+
     /**
      * A mixin for dgrid's DND Source to override some functions
      */
@@ -21,19 +26,18 @@ define([
          * @override
          */
         onDndStart: function(source, nodes, copy) {
-            // summary:
-            //   listen for start events to apply style change to avatar
+            // Call the root inherited function, skipping the level in dgrid/extensions/DnD.js
+            Source.prototype.onDndStart.apply(this, arguments);
 
-            this.inherited('onDndStart', arguments); // Source.prototype.onDndStart.apply(this, arguments);
-/*            if (source == this) {
+            if (source == this) {
                 // Make the avatar the same width as the grid it was dragged from
-                Manager.manager().avatar.node.style.width = html.contentBox(nodes[0]).w + 'px';
+                Manager.manager().avatar.node.style.width = domGeometry.getContentBox(nodes[0]).w + 'px';
 
                 // Make the row nodes fade out more aggressively than the default
                 query('.dojoDndAvatarItem', Manager.manager().avatar.node).forEach(function(node, i) {
-                    html.style(node, 'opacity', (9 - (i*2))/10);
+                    domStyle.set(node, 'opacity', (9 - (i*2))/10);
                 });
-            }*/
+            }
         },
 
         /**
