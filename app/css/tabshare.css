@@ -57,68 +57,45 @@ body, html {
 }
 
 .windowContainer
-    .dgrid-scroller
-        .dgrid-row.dgrid-selected
-            .dgrid-cell.field-title
-                h1 {
+    .dgrid-row.dgrid-selected
+        .dgrid-cell.field-title
+            h1 {
     color: #5ba0ff;
 }
 
 .windowContainer
-    .dgrid-scroller
-        .dgrid-row.dojoDndItemAfter {
+    .dgrid-row.dojoDndItemAfter {
     border-bottom: 16px solid #ccc;
 }
 
 .windowContainer
-    .dgrid-scroller
-        .dgrid-row.dojoDndItemBefore {
+    .dgrid-row.dojoDndItemBefore {
     border-top: 16px solid #ccc;
 }
 
 .windowContainer
-    .dgrid-scroller
-        .dgrid-row:not(:active).dojoDndItemOver:not(.dgrid-selected):not(.dojoDndItemAfter):not(.dojoDndItemBefore)
-            .dgrid-cell.field-title
-                h1 {
+    .dgrid-row:not(:active).dojoDndItemOver:not(.dgrid-selected):not(.dojoDndItemAfter):not(.dojoDndItemBefore)
+        .dgrid-cell.field-title
+            h1 {
     color: #999;
 }
 
-.windowContainer
-    .dgrid-scroller
-        .dgrid-row
-            .dgrid-cell,
-.dojoDndAvatar
-    .dojoDndAvatarItem
-        .dgrid-row
-            .dgrid-cell {
+.dgrid-row
+    .dgrid-cell {
     border: none;
     padding: 5px;
     background: #fff;
 }
 
-.windowContainer
-    .dgrid-scroller
-        .dgrid-row
-            .dgrid-cell.field-favicon,
-.dojoDndAvatar
-    .dojoDndAvatarItem
-        .dgrid-row
-            .dgrid-cell.field-favicon {
+.dgrid-row
+    .dgrid-cell.field-favicon {
     width: 16px;
     height: 16px;
 }
 
-.windowContainer
-    .dgrid-scroller
-        .dgrid-row
-            .dgrid-cell.field-title
-                h1,
-.dojoDndAvatar
-    .dojoDndAvatarItem
-        .dgrid-row
-            .dgrid-cell.field-title
-                h1 {
+.dgrid-row
+    .dgrid-cell.field-title
+        h1 {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -128,16 +105,9 @@ body, html {
     line-height: 1em;
 }
 
-.windowContainer
-    .dgrid-scroller
-        .dgrid-row
-            .dgrid-cell.field-title
-                h2,
-.dojoDndAvatar
-    .dojoDndAvatarItem
-        .dgrid-row
-            .dgrid-cell.field-title
-                h2 {
+.dgrid-row
+    .dgrid-cell.field-title
+        h2 {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
